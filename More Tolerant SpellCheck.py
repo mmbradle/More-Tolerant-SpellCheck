@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# This file is a plugin for anki flashcard application 
+# This file is a plugin for anki flashcard application
 # ---------------------------------------------------------------------------
 # File:        More Tolerant SpellCheck.py
 # Description: Makes Spellchecking after type in answer more tolerant.
@@ -48,12 +48,12 @@ class TolerantSpellCheck():
     AA = []
     BB = []
 #    spellChecker = SpellCheck()
-    
+
     def __init__(self):
         '''
         Constructor
-        '''         
-        
+        '''
+
     def longestCommonSubstring(self, S1, S2):
         M = [[0]*(1+len(S2)) for i in xrange(1+len(S1))] #build matrix
         longest, x_longest = 0, 0
@@ -69,22 +69,22 @@ class TolerantSpellCheck():
         return S1[x_longest-longest: x_longest]
 
     def findSubstr(self, substr, str):
-        bPass = False    
-        for i in range(len(str)):        
+        bPass = False
+        for i in range(len(str)):
             for j in range(len(substr)):
                 if str[0+i+j] == substr[j]:
                     bPass = True #passes so far, loop again to see if it continues to do so
                 else:
-                    bPass = False                 
+                    bPass = False
                     break
             if bPass == True:
-                break            
+                break
         if bPass:
             return i
         else:
             return -1
     def check(self, old, new):
-        ret = ""; 
+        ret = "";
         if ((new == "") or (new==" ")):
             return ""
         self.AA=[]
@@ -103,22 +103,22 @@ class TolerantSpellCheck():
         insert = st % (self.insertColor, sz, fn)
 
         old = self.__stripPunct(old).lower()
-        new = self.__stripPunct(new).lower()        
-        
+        new = self.__stripPunct(new).lower()
+
         old = old.split()
         new = new.split()
         if old == new:
             return ("<span style='%s'>%s</span>" % (ok, "Good!"))
-                
-#        selfspellChecker.trainMore(old)        
-        #spell correct        
+
+#        selfspellChecker.trainMore(old)
+        #spell correct
 #        for i in range(len(new)):
 #            new[i] = self.spellChecker.correct(new[i])
         #for i in range(len(old)):
-        #    old[i] = correct(old[i])                        
-        
-        self.parseDiff(old, new)        
-     
+        #    old[i] = correct(old[i])
+
+        self.parseDiff(old, new)
+
         for i in range(len(self.AA)):
             if self.AA[i][1] == 0:
                 ret += ("<span style='%s'>%s</span>" % (ok, self.AA[i][0]))
@@ -133,9 +133,9 @@ class TolerantSpellCheck():
                 ret += ("<span style='%s'>%s</span>" % (delete, self.BB[i][0]))
             elif self.AA[i][1] == 2:
                 ret += ("<span style='%s'>%s</span>" % (insert, self.AA[i][0]))
-        return ret    
-        
-    def parseDiff(self, A, B):    
+        return ret
+
+    def parseDiff(self, A, B):
         #function
         aTemp = A
         bTemp = B
@@ -152,20 +152,20 @@ class TolerantSpellCheck():
             lcsLocA = self.findSubstr(lcsTemp, aTemp)
             lcsLocB = self.findSubstr(lcsTemp, bTemp)
         lcsArray = sorted(lcsArray, key=lambda student: student[1])
-        
+
         aSubstrLoc, bSubstrLoc = 0, 0
-        for lcs in lcsArray:                 
+        for lcs in lcsArray:
             aSubstrLoc = self.findSubstr(lcs[0], A)
             bSubstrLoc = self.findSubstr(lcs[0], B)
             aCode = 1
-            if aSubstrLoc > 0:            
-                aCode = 2            
+            if aSubstrLoc > 0:
+                aCode = 2
             bCode = 1
             if bSubstrLoc > 0:
                 bCode = 2
             if aCode == bCode:
                 aCode = 3
-                bCode = 3        
+                bCode = 3
             assert(aSubstrLoc >= 0)
             assert(bSubstrLoc >= 0)
             if ((aSubstrLoc > 0)or(bSubstrLoc > 0)):
@@ -173,10 +173,10 @@ class TolerantSpellCheck():
                 self.BB.append((" ".join(B[0:bSubstrLoc]),bCode))
                 A = A[aSubstrLoc:]
                 B = B[bSubstrLoc:]
-            self.AA.append((" "+" ".join(A[:len(lcs[0])])+" ",0)) 
-            self.BB.append((" "+" ".join(B[:len(lcs[0])])+" ",0))            
+            self.AA.append((" "+" ".join(A[:len(lcs[0])])+" ",0))
+            self.BB.append((" "+" ".join(B[:len(lcs[0])])+" ",0))
             A = A[len(lcs[0]):]
-            B = B[len(lcs[0]):]            
+            B = B[len(lcs[0]):]
         aCode = 1
         if len(A) > 0:
             aCode = 2
@@ -189,7 +189,7 @@ class TolerantSpellCheck():
         if A or B:
             self.AA.append((" ".join(A),aCode))
             self.BB.append((" ".join(B),bCode))
-   
+
     def __strip_accents(self, string):
         import unicodedata
         return unicodedata.normalize('NFKD', string).encode('ASCII', errors='ignore')
@@ -201,7 +201,7 @@ class TolerantSpellCheck():
         if b == "" or b==" ":
             return "";
         ret = ""
-        
+
         a = a.split()
         b = b.split()
         aa=list(a)
@@ -212,25 +212,25 @@ class TolerantSpellCheck():
         for i in range(len(b)):
             b[i] = self.__stripPunct(b[i])
             b[i] = b[i].upper()
-        
+
         s = difflib.SequenceMatcher(None, b, a)
- 
+
         try:
             sz = mw.bodyView.main.currentCard.cardModel.answerFontSize
             fn = mw.bodyView.main.currentCard.cardModel.answerFontFamily
         except:
             sz = 18
-            fn = "Times New Roman"        
+            fn = "Times New Roman"
         st = "background: %s; color: #000; font-size: %dpx; font-family: %s;"
         ok = st % (self.okColor, sz, fn)
         replace = st % (self.replaceColor, sz, fn)
         delete = st % (self.deleteColor, sz, fn)
         delete += "text-decoration: line-through;"
         insert = st % (self.insertColor, sz, fn)
-     
+
         for tag, i1, i2, j1, j2 in s.get_opcodes():
             if tag == "equal":
-                ret += ("<span style='%s'>%s</span>" % (ok, " ".join(aa[j1:j2])))                
+                ret += ("<span style='%s'>%s</span>" % (ok, " ".join(aa[j1:j2])))
             elif tag == "replace":
                 ret += ("<span style='%s'>%s</span>"
                         % (insert, '[' ))
@@ -243,11 +243,11 @@ class TolerantSpellCheck():
             elif tag == "insert":
                 ret += ("<span style='%s'>%s</span>" % (insert, " ".join(aa[j1:j2])))
             if j2 < len(aa):
-                ret += ("<span style='%s'>%s</span>" % (ok, " "))     
-        return ret    
-    
-def tolerantCorrect(a, b):
-    tolSpell = TolerantSpellCheck()    
+                ret += ("<span style='%s'>%s</span>" % (ok, " "))
+        return ret
+
+def tolerantCorrect(a, b, showBad):
+    tolSpell = TolerantSpellCheck()
     if tolSpell.useWordBasedCheck:
         return tolSpell.check(a, b)
     else:
@@ -255,18 +255,18 @@ def tolerantCorrect(a, b):
 
 mw.reviewer.correct = tolerantCorrect
 
-class SpellCheckTest(unittest.TestCase):                            
-#    def test1Spell(self):                
+class SpellCheckTest(unittest.TestCase):
+#    def test1Spell(self):
 #        verse  = u"and to put on the new self, created in"
-#        input  = u"put on the new sllf created in the"                          
+#        input  = u"put on the new sllf created in the"
 #        tolerantCorrect(input, verse)
-    def test2Spell(self):                
+    def test2Spell(self):
         verse  = u"to put off your old self, which belongs to your former manner of life and is corrupt through deceitful desires,"
-        input  = u"to off put your old sllf which belongs to your former manner of life and is corrupt through decietful desires"                          
+        input  = u"to off put your old sllf which belongs to your former manner of life and is corrupt through decietful desires"
         verse = u"1 2 3"
         input = u"2 3"
         tolerantCorrect(verse, input)
 
-if __name__ == "__main__":    
-    unittest.main() 
+if __name__ == "__main__":
+    unittest.main()
 
